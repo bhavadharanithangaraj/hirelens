@@ -24,6 +24,7 @@ export function PipelineProgress() {
 
   return (
     <section className="card progress" aria-labelledby="progress-title" aria-busy="true">
+      <div className="progress__bar" aria-hidden="true" />
       <h2 id="progress-title">Analyzing your match…</h2>
       <ol className="progress__steps">
         {PIPELINE_STEPS.map((step, index) => {
@@ -44,6 +45,14 @@ export function PipelineProgress() {
           );
         })}
       </ol>
+      <div className="skeleton" aria-hidden="true">
+        <div className="skeleton__ring" />
+        <div className="skeleton__lines">
+          <div className="skeleton__line" style={{ width: "35%" }} />
+          <div className="skeleton__line" style={{ width: "80%" }} />
+          <div className="skeleton__line" style={{ width: "65%" }} />
+        </div>
+      </div>
       <p className="visually-hidden" role="status" aria-live="polite">
         Step {current + 1} of {PIPELINE_STEPS.length}: {PIPELINE_STEPS[current].title}
       </p>

@@ -1,4 +1,5 @@
 import type { HistoryItem } from "../types";
+import { stagger } from "./stagger";
 import { scoreBand } from "./ScoreRing";
 
 interface HistorySidebarProps {
@@ -16,12 +17,13 @@ export function HistorySidebar({ items, activeId, error, onSelect }: HistorySide
       <nav aria-labelledby="history-title">
         <h2 id="history-title" className="sidebar__title">
           History
+          {items.length > 0 && <span className="count">{items.length}</span>}
         </h2>
         {error && <p className="muted">{error}</p>}
         {!error && items.length === 0 && <p className="muted">Your past analyses will appear here.</p>}
         <ul className="history">
-          {items.map((item) => (
-            <li key={item.id}>
+          {items.map((item, index) => (
+            <li key={item.id} style={stagger(index)}>
               <button
                 type="button"
                 className="history__item"

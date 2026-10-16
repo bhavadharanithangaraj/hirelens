@@ -9,7 +9,7 @@ const LONG_JD = "We are hiring a React + Python developer to build Gen AI featur
 
 function setup(props: Partial<Parameters<typeof AnalyzeForm>[0]> = {}) {
   const onSubmit = vi.fn();
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
   render(<AnalyzeForm onSubmit={onSubmit} loading={false} {...props} />);
   return {
     user,
@@ -62,6 +62,23 @@ describe("AnalyzeForm validation", () => {
   it("disables the submit button while loading", () => {
     setup({ loading: true });
     expect(screen.getByRole("button", { name: "Analyzing…" })).toBeDisabled();
+  });
+
+  it("shows an uploading state until the PDF text arrives", async () => {
+    let finish!: (text: string) => void;
+    const extractPdfText = vi.fn(() => new Promise<string>((resolve) => (finish = resolve)));
+    const { user, resume, submit } = setup({ extractPdfText });
+
+    await user.upload(screen.getByTestId("pdf-input"), new File(["%PDF-1.4"], "cv.pdf", { type: "application/pdf" }));
+
+    expect(screen.getByRole("button", { name: "Uploading…" })).toBeDisabled();
+    expect(submit).toBeDisabled();
+    expect(screen.getByRole("status", { name: "" })).toHaveTextContent("Reading cv.pdf…");
+
+    finish(LONG_RESUME);
+    expect(await screen.findByRole("button", { name: "Upload PDF" })).toBeEnabled();
+    expect(resume).toHaveValue(LONG_RESUME);
+    expect(submit).toBeEnabled();
   });
 
   it("fills the resume from an uploaded PDF", async () => {

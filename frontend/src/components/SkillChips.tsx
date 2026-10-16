@@ -1,3 +1,5 @@
+import { stagger } from "./stagger";
+
 interface SkillChipsProps {
   title: string;
   skills: string[];
@@ -8,7 +10,7 @@ interface SkillChipsProps {
 export function SkillChips({ title, skills, variant, emptyText }: SkillChipsProps) {
   const headingId = `skills-${variant}`;
   return (
-    <section className="card" aria-labelledby={headingId}>
+    <section className="card spotlight" aria-labelledby={headingId}>
       <h3 id={headingId}>
         {title} <span className="count">{skills.length}</span>
       </h3>
@@ -16,8 +18,8 @@ export function SkillChips({ title, skills, variant, emptyText }: SkillChipsProp
         <p className="muted">{emptyText}</p>
       ) : (
         <ul className="chips">
-          {skills.map((skill) => (
-            <li key={skill} className={`chip chip--${variant}`}>
+          {skills.map((skill, index) => (
+            <li key={skill} className={`chip chip--${variant}`} style={stagger(index)}>
               <span aria-hidden="true">{variant === "matched" ? "✓" : "✕"}</span> {skill}
             </li>
           ))}

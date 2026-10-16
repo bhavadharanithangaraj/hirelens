@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { BulletRewrite } from "../types";
+import { stagger } from "./stagger";
 
 export function BulletCard({ bullet, index }: { bullet: BulletRewrite; index: number }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
@@ -21,7 +22,7 @@ export function BulletCard({ bullet, index }: { bullet: BulletRewrite; index: nu
   }
 
   return (
-    <article className="card bullet" aria-label={`Bullet ${index + 1}`}>
+    <article className="card bullet spotlight reveal" style={stagger(index + 4)} aria-label={`Bullet ${index + 1}`}>
       <div className="bullet__compare">
         <div className="bullet__before">
           <h4>Before</h4>
@@ -36,7 +37,7 @@ export function BulletCard({ bullet, index }: { bullet: BulletRewrite; index: nu
         <p className="bullet__reason">
           <strong>Why:</strong> {bullet.reason}
         </p>
-        <button type="button" className="btn btn--ghost btn--small" onClick={copy} aria-label={`Copy improved bullet ${index + 1}`}>
+        <button type="button" className={`btn btn--ghost btn--small${copyState === "copied" ? " btn--copied" : ""}`} onClick={copy} aria-label={`Copy improved bullet ${index + 1}`}>
           {copyState === "copied" ? "Copied!" : copyState === "failed" ? "Copy failed" : "Copy"}
         </button>
         <span className="visually-hidden" role="status" aria-live="polite">

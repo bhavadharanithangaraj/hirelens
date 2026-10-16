@@ -2,6 +2,9 @@ import type { Analysis, ExtractTextResponse, HistoryItem } from "./types";
 
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 
+// Generous enough to cover a free-tier backend waking up from sleep.
+const PDF_TIMEOUT_MS = 90_000;
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -25,7 +28,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_URL}${path}`, init);
-  } catch {
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "TimeoutError") {
+      throw new ApiError("The server took too long to respond. Please try again.", 0);
+    }
     throw new ApiError("Can't reach the HireLens server. Is the backend running?", 0);
   }
 
@@ -48,7 +54,11 @@ export const api = {
   extractText(file: File): Promise<ExtractTextResponse> {
     const form = new FormData();
     form.append("file", file);
-    return request<ExtractTextResponse>("/api/extract-text", { method: "POST", body: form });
+    return request<ExtractTextResponse>("/api/extract-text", {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(PDF_TIMEOUT_MS),
+    });
   },
 
   listHistory(): Promise<HistoryItem[]> {
