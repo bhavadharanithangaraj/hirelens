@@ -150,7 +150,7 @@ Frontend coverage: `ScoreRing` (accessible meter, clamping, arc maths, colour ba
 | Part | Host | URL |
 | --- | --- | --- |
 | Frontend (`frontend/`) | GitHub Pages | https://bhavadharanithangaraj.github.io/hirelens/ |
-| API (`backend/`) | Render free tier | https://hirelens-api.onrender.com |
+| API (`backend/`) | Render free tier | https://hirelens-api-eslq.onrender.com |
 
 ### Frontend → GitHub Pages
 
@@ -163,7 +163,7 @@ The API URL is set by `VITE_API_URL` in the workflow. Vite inlines it at build t
 1. In Render, choose **New → Blueprint**, connect the repo and click **Apply**. Render reads [`render.yaml`](render.yaml) and creates the `hirelens-api` web service.
 2. When prompted, set `GEMINI_API_KEY` (free key at https://aistudio.google.com/apikey). To demo without a key, set `LLM_PROVIDER=mock` instead.
 
-`CORS_ORIGINS` is preset to the Pages origin. If Render gives the service a different URL, update `VITE_API_URL` in the workflow.
+`CORS_ORIGINS` is preset to the Pages origin. Render added a suffix to the service URL because `hirelens-api` was taken; if you redeploy under a different URL, update `VITE_API_URL` in the workflow.
 
 > **Notes:** Free instances sleep after about 15 minutes idle, so the first request can take up to a minute. Their filesystem is ephemeral, so the SQLite history resets on each deploy or restart. For persistent history, attach a Render PostgreSQL database, set `DATABASE_URL` to its URL (`postgresql+psycopg://...`) and add `psycopg[binary]` to `requirements.txt`. No code changes are needed because the app goes through SQLAlchemy.
 

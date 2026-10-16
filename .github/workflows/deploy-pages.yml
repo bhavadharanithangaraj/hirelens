@@ -33,7 +33,7 @@ jobs:
       - run: npm run build:pages
         env:
           # The FastAPI backend on Render; Vite inlines this at build time.
-          VITE_API_URL: https://hirelens-api.onrender.com
+          VITE_API_URL: https://hirelens-api-eslq.onrender.com
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
