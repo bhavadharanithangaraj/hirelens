@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./hirelens.db"
     cors_origins: str = "http://localhost:5173"
+    # Optional regex for extra allowed origins, e.g. preview or suffixed deploy URLs.
+    cors_origin_regex: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:

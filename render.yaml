@@ -1,4 +1,5 @@
-# Render Blueprint for the HireLens API. Deploy via Dashboard -> New -> Blueprint.
+# Render Blueprint for HireLens: the FastAPI backend and the React frontend.
+# Deploy via Dashboard -> New -> Blueprint and pick this repo.
 services:
   - type: web
     name: hirelens-api
@@ -20,4 +21,20 @@ services:
       - key: DATABASE_URL
         value: sqlite:///./hirelens.db
       - key: CORS_ORIGINS
-        sync: false # e.g. https://hirelens.vercel.app
+        value: https://hirelens.onrender.com
+      # Also allows the frontend if Render gives it a suffixed URL (e.g. hirelens-ab12.onrender.com).
+      - key: CORS_ORIGIN_REGEX
+        value: https://hirelens[a-z0-9-]*\.onrender\.com
+
+  - type: web
+    name: hirelens
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22.12.0"
+      # Inlined by Vite at build time; if Render suffixes the API's URL, update this and redeploy.
+      - key: VITE_API_URL
+        value: https://hirelens-api.onrender.com

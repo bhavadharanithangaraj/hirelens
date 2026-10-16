@@ -77,7 +77,7 @@ hirelens/
 │       ├── App.tsx
 │       └── components/        # AnalyzeForm, PipelineProgress, Results, ScoreRing,
 │                              # SkillChips, BulletCard, HistorySidebar (+ __tests__)
-└── render.yaml                # backend deployment blueprint
+└── render.yaml                # Render blueprint (API + static site)
 ```
 
 ## API
@@ -146,21 +146,20 @@ Frontend coverage: `ScoreRing` (accessible meter, clamping, arc maths, colour ba
 
 ## Deploy
 
-### Backend → Render
+Both services deploy to Render's free tier from [`render.yaml`](render.yaml):
+
+| Service | Type | URL |
+| --- | --- | --- |
+| `hirelens` | Static site (`frontend/`) | https://hirelens.onrender.com |
+| `hirelens-api` | Python web service (`backend/`) | https://hirelens-api.onrender.com |
 
 1. Push the repo to GitHub.
-2. In Render, choose **New → Blueprint**, pick the repo, and Render reads [`render.yaml`](render.yaml). It creates a Python web service with `rootDir: backend`, start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT` and health check `/api/health`.
-3. Set the secret env vars in the dashboard:
-   - `GEMINI_API_KEY`: your key
-   - `CORS_ORIGINS`: your Vercel URL, e.g. `https://hirelens.vercel.app` (comma-separate multiple origins and include no trailing slash)
+2. In Render, choose **New → Blueprint**, connect the repo and click **Apply**. Render reads `render.yaml` and creates both services.
+3. When prompted, set `GEMINI_API_KEY` (free key at https://aistudio.google.com/apikey). To demo without a key, set `LLM_PROVIDER=mock` on `hirelens-api` instead.
 
-> **Note:** Render's free instances have an ephemeral filesystem, so the SQLite history resets on each deploy or restart. For persistent history, attach a Render PostgreSQL database, set `DATABASE_URL` to its URL (`postgresql+psycopg://...`), and add `psycopg[binary]` to `requirements.txt`. No code changes are needed because the app goes through SQLAlchemy.
+If a service name is taken, Render adds a suffix to its URL. The backend already accepts any `https://hirelens*.onrender.com` origin through `CORS_ORIGIN_REGEX`. If the **API** URL changes, update `VITE_API_URL` on the static site and redeploy it, because Vite inlines it at build time.
 
-### Frontend → Vercel
-
-1. **Add New → Project**, import the repo, and set **Root Directory** to `frontend`. Vercel detects Vite automatically (build `npm run build`, output `dist`).
-2. Add the env var `VITE_API_URL=https://<your-render-service>.onrender.com`. Vite inlines it at **build time**, so redeploy after changing it.
-3. Make sure that Vercel URL is listed in the backend's `CORS_ORIGINS`.
+> **Notes:** Free instances sleep after about 15 minutes idle, so the first request can take up to a minute. Their filesystem is ephemeral, so the SQLite history resets on each deploy or restart. For persistent history, attach a Render PostgreSQL database, set `DATABASE_URL` to its URL (`postgresql+psycopg://...`) and add `psycopg[binary]` to `requirements.txt`. No code changes are needed because the app goes through SQLAlchemy.
 
 ## Possible next steps
 
