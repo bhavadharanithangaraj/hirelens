@@ -56,6 +56,7 @@ flowchart LR
 
 ```
 hirelens/
+├── .github/workflows/     # deploy-pages.yml: frontend → GitHub Pages
 ├── backend/
 │   ├── app/
 │   │   ├── main.py            # app factory, CORS, LLMError → 502, health
@@ -77,7 +78,7 @@ hirelens/
 │       ├── App.tsx
 │       └── components/        # AnalyzeForm, PipelineProgress, Results, ScoreRing,
 │                              # SkillChips, BulletCard, HistorySidebar (+ __tests__)
-└── render.yaml                # Render blueprint (API + static site)
+└── render.yaml                # Render blueprint for the API
 ```
 
 ## API
@@ -146,18 +147,23 @@ Frontend coverage: `ScoreRing` (accessible meter, clamping, arc maths, colour ba
 
 ## Deploy
 
-Both services deploy to Render's free tier from [`render.yaml`](render.yaml):
-
-| Service | Type | URL |
+| Part | Host | URL |
 | --- | --- | --- |
-| `hirelens` | Static site (`frontend/`) | https://hirelens.onrender.com |
-| `hirelens-api` | Python web service (`backend/`) | https://hirelens-api.onrender.com |
+| Frontend (`frontend/`) | GitHub Pages | https://bhavadharanithangaraj.github.io/hirelens/ |
+| API (`backend/`) | Render free tier | https://hirelens-api.onrender.com |
 
-1. Push the repo to GitHub.
-2. In Render, choose **New → Blueprint**, connect the repo and click **Apply**. Render reads `render.yaml` and creates both services.
-3. When prompted, set `GEMINI_API_KEY` (free key at https://aistudio.google.com/apikey). To demo without a key, set `LLM_PROVIDER=mock` on `hirelens-api` instead.
+### Frontend → GitHub Pages
 
-If a service name is taken, Render adds a suffix to its URL. The backend already accepts any `https://hirelens*.onrender.com` origin through `CORS_ORIGIN_REGEX`. If the **API** URL changes, update `VITE_API_URL` on the static site and redeploy it, because Vite inlines it at build time.
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) runs the tests, builds with `npm run build:pages` (which sets Vite's `base` to `/hirelens/`) and publishes `frontend/dist` on every push to `main` that touches `frontend/`. One-time setup: **Settings → Pages → Source: GitHub Actions**.
+
+The API URL is set by `VITE_API_URL` in the workflow. Vite inlines it at build time, so re-run the workflow after changing it.
+
+### Backend → Render
+
+1. In Render, choose **New → Blueprint**, connect the repo and click **Apply**. Render reads [`render.yaml`](render.yaml) and creates the `hirelens-api` web service.
+2. When prompted, set `GEMINI_API_KEY` (free key at https://aistudio.google.com/apikey). To demo without a key, set `LLM_PROVIDER=mock` instead.
+
+`CORS_ORIGINS` is preset to the Pages origin. If Render gives the service a different URL, update `VITE_API_URL` in the workflow.
 
 > **Notes:** Free instances sleep after about 15 minutes idle, so the first request can take up to a minute. Their filesystem is ephemeral, so the SQLite history resets on each deploy or restart. For persistent history, attach a Render PostgreSQL database, set `DATABASE_URL` to its URL (`postgresql+psycopg://...`) and add `psycopg[binary]` to `requirements.txt`. No code changes are needed because the app goes through SQLAlchemy.
 
