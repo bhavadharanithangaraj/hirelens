@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     llm_provider: Literal["gemini", "mock"] = "mock"
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.8-flash"
     llm_timeout_seconds: float = 60.0
 
     database_url: str = "sqlite:///./hirelens.db"
