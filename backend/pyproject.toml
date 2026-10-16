@@ -1,0 +1,12 @@
+[project]
+name = "hirelens-backend"
+version = "1.0.0"
+description = "HireLens - AI resume & job-match assistant (FastAPI backend)"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+# Upstream notice from starlette's TestClient about its httpx backend; not actionable here.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]

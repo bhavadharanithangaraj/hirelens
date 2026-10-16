@@ -1,0 +1,6 @@
+# Project-specific rules live in backend/.gitignore and frontend/.gitignore.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log

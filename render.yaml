@@ -1,0 +1,23 @@
+# Render Blueprint for the HireLens API. Deploy via Dashboard -> New -> Blueprint.
+services:
+  - type: web
+    name: hirelens-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false # set in the Render dashboard, never committed
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: DATABASE_URL
+        value: sqlite:///./hirelens.db
+      - key: CORS_ORIGINS
+        sync: false # e.g. https://hirelens.vercel.app
