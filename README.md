@@ -115,6 +115,7 @@ The API runs on http://localhost:8000. It uses `LLM_PROVIDER=mock` by default. T
 | `LLM_PROVIDER` | `mock` | `gemini` or `mock` |
 | `GEMINI_API_KEY` | – | Required when the provider is `gemini` (the app refuses to start without it) |
 | `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model id |
+| `GEMINI_FALLBACK_MODELS` | `gemini-flash-lite-latest` | Comma-separated models tried when the main one stays overloaded (429/5xx after retries) |
 | `DATABASE_URL` | `sqlite:///./hirelens.db` | SQLAlchemy URL |
 | `CORS_ORIGINS` | `http://localhost:5173` | Comma-separated allowed origins |
 

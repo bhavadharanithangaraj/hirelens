@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     llm_provider: Literal["gemini", "mock"] = "mock"
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"
+    # Comma-separated models to try when the main one is overloaded.
+    gemini_fallback_models: str = "gemini-flash-lite-latest"
     llm_timeout_seconds: float = 60.0
 
     database_url: str = "sqlite:///./hirelens.db"

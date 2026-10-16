@@ -12,5 +12,6 @@ def build_llm_client(settings: Settings) -> LLMClient:
             api_key=settings.gemini_api_key,
             model=settings.gemini_model,
             timeout=settings.llm_timeout_seconds,
+            fallback_models=[m.strip() for m in settings.gemini_fallback_models.split(",")],
         )
     return MockClient()
